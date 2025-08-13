@@ -1,14 +1,13 @@
 package com.michaelolech;
 
 import java.util.Map;
-import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) {
         Map<String, Integer> expressions = Map.of(
                 "2 + 2 - 6 / 2 * 5 + 2", -9,
                 "3 * -2 + 6", 0,
-                "5 / 2 / 6 + 5", 5
+                "6 / 2 / 6 + 5 + 15 / 3", 10
         );
 
         for (String expression : expressions.keySet()) {
@@ -22,33 +21,44 @@ public class Main {
 
     public static int calculate(String expression) {
         String[] values = expression.split(" ");
-        int result = 0;
+        boolean isfirstOfPartialResult = true;
+        int partialResult = 0;
+        int firstIndexOfPartialResult = 0;
+        int finalResult = 0;
 
         try {
-            boolean first = false;
             for (int i = 0; i < values.length; i++) {
                 if (i % 2 == 1) {
                     int right = Integer.parseInt(values[i + 1]);
 
-                    if (!first && (Objects.equals(values[i], "*") || Objects.equals(values[i], "/"))) {
-                        first = true;
-                        result = Integer.parseInt(values[i - 1]);
-                    }
-
                     switch (values[i]) {
                         case "+":
                         case "-":
+                            if (!isfirstOfPartialResult) {
+                                isfirstOfPartialResult = true;
+                                values[firstIndexOfPartialResult] = String.valueOf(partialResult);
+                                values[i - 1] = String.valueOf(partialResult);
+                                partialResult = 0;
+                            }
+
                             break;
                         case "*":
-                            result *= right;
-                            values[i + 1] = "0";
+                            if (isfirstOfPartialResult) {
+                                isfirstOfPartialResult = false;
+                                firstIndexOfPartialResult = i - 1;
+                                partialResult = Integer.parseInt(values[firstIndexOfPartialResult]);
+                            }
+
+                            partialResult *= right;
                             break;
                         case "/":
-                            if (right == 0) {
-                                throw new ArithmeticException("Cannot divide by zero");
+                            if (isfirstOfPartialResult) {
+                                isfirstOfPartialResult = false;
+                                firstIndexOfPartialResult = i - 1;
+                                partialResult = Integer.parseInt(values[firstIndexOfPartialResult]);
                             }
-                            result /= right;
-                            values[i + 1] = "0";
+
+                            partialResult /= right;
                             break;
                         default:
                             throw new IllegalArgumentException("Incorrect operator.");
@@ -56,16 +66,27 @@ public class Main {
                 }
             }
 
+            if (!isfirstOfPartialResult) {
+                values[firstIndexOfPartialResult] = String.valueOf(partialResult);
+            }
+
+            boolean firstValue = true;
+
             for (int i = 0; i < values.length; i++) {
                 if (i % 2 == 1) {
                     int right = Integer.parseInt(values[i + 1]);
 
+                    if (firstValue) {
+                        firstValue = false;
+                        finalResult = Integer.parseInt(values[i - 1]);
+                    }
+
                     switch (values[i]) {
                         case "+":
-                            result += right;
+                            finalResult += right;
                             break;
                         case  "-":
-                            result -= right;
+                            finalResult -= right;
                             break;
                         case "*":
                         case "/":
@@ -79,6 +100,6 @@ public class Main {
             throw new NumberFormatException("Invalid number.");
         }
 
-        return result;
+        return finalResult;
     }
 }
