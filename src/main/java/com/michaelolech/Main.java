@@ -7,7 +7,7 @@ public class Main {
 
     public static int calculate(String expression) {
         String[] values = expression.split(" ");
-        int result = 0;
+        int result;
 
         try {
             result = Integer.parseInt(values[0]);
@@ -28,11 +28,13 @@ public class Main {
                         case "/":
                             result /= right;
                             break;
+                        default:
+                            throw new IllegalArgumentException("Incorrect operator.");
                     }
                 }
             }
         } catch (NumberFormatException exception) {
-            throw new NumberFormatException("Invalid number or operator");
+            throw new NumberFormatException("Invalid number.");
         }
 
         return result;
