@@ -1,40 +1,40 @@
 package com.michaelolech;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Main {
     public static void main(String[] args) {
-        System.out.printf("Hello and welcome!");
-
-        for (int i = 1; i <= 5; i++) {
-            System.out.println("i = " + i);
-        }
+        System.out.println(calculate("3 * -2 + 6"));
     }
 
     public static int calculate(String expression) {
         String[] values = expression.split(" ");
-        List<Integer> numbers = new ArrayList<>();
-        List<String> operators = new ArrayList<>();
+        int result = 0;
 
         try {
-            for(String value : values) {
-                switch (value) {
-                    case "-":
-                    case "+":
-                    case "*":
-                    case "/":
-                        operators.add(value);
-                        break;
-                    default:
-                        numbers.add(Integer.parseInt(value));
-                        break;
+            result = Integer.parseInt(values[0]);
+            for (int i = 0; i < values.length; i++) {
+                if (i % 2 == 1) {
+                    int right = Integer.parseInt(values[i + 1]);
+
+                    switch (values[i]) {
+                        case "+":
+                            result += right;
+                            break;
+                        case  "-":
+                            result -= right;
+                            break;
+                        case "*":
+                            result *= right;
+                            break;
+                        case "/":
+                            result /= right;
+                            break;
+                    }
                 }
             }
         } catch (NumberFormatException exception) {
             throw new NumberFormatException("Invalid number or operator");
         }
 
-
+        return result;
     }
 }
